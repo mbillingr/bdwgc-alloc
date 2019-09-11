@@ -50,6 +50,7 @@ fn main() {
     let dst = Config::new(LIB_GC_DIR)
         //.no_build_target(true)
         .profile("Release")
+        .define("BUILD_SHARED_LIBS", "FALSE")
         .build();
 
     println!("cargo:rustc-link-search=native={}", dst.join("lib").display());
