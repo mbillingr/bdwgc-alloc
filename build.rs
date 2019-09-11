@@ -1,6 +1,7 @@
 const LIB_ATOMIC_OPS_DIR: &str = "vendor/libatomic_ops";
 const LIB_GC_DIR: &str = "vendor/bdwgc";
 
+#[cfg(feature = "autotools")]
 fn main() {
     for dir in &[LIB_ATOMIC_OPS_DIR, LIB_GC_DIR] {
         std::process::Command::new("sh")
@@ -40,4 +41,17 @@ fn main() {
             .output()
             .unwrap();
     }
+}
+
+#[cfg(feature = "cmake")]
+fn main() {
+    use cmake::Config;
+
+    let dst = Config::new(LIB_GC_DIR)
+        //.no_build_target(true)
+        .profile("Release")
+        .build();
+
+    println!("cargo:rustc-link-search=native={}", dst.join("lib").display());
+    println!("cargo:rustc-link-lib=static=gc");
 }
