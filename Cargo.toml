@@ -9,9 +9,7 @@ license = "MIT"
 build = "build.rs"
 
 [features]
-#default = ["autotools"]
-default = ["cmake"]
-
+default = ["autotools"]
 
 [dependencies]
 libc = "0.2"
