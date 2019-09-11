@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 const LIB_ATOMIC_OPS_DIR: &str = "vendor/libatomic_ops";
 const LIB_GC_DIR: &str = "vendor/bdwgc";
 
@@ -47,12 +49,22 @@ fn main() {
 fn main() {
     use cmake::Config;
 
+    #[cfg(windows)]
+    {
+        use std::path::Path;
+        if !Path::new(LIB_GC_DIR).join("libatomic_ops").exists() {
+            panic!("TODO: find a nice solution to put libatomic_ops as a subdir into bdwgc")
+        }
+    }
+
     let dst = Config::new(LIB_GC_DIR)
-        //.no_build_target(true)
         .profile("Release")
         .define("BUILD_SHARED_LIBS", "FALSE")
         .build();
 
-    println!("cargo:rustc-link-search=native={}", dst.join("lib").display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dst.join("lib").display()
+    );
     println!("cargo:rustc-link-lib=static=gc");
 }
