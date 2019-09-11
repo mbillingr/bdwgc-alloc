@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 const LIB_ATOMIC_OPS_DIR: &str = "vendor/libatomic_ops";
 const LIB_GC_DIR: &str = "vendor/bdwgc";
 
@@ -48,18 +46,20 @@ fn main() {
 #[cfg(feature = "cmake")]
 fn main() {
     use cmake::Config;
+    use std::path::Path;
 
-    #[cfg(windows)]
-    {
-        use std::path::Path;
-        if !Path::new(LIB_GC_DIR).join("libatomic_ops").exists() {
-            panic!("TODO: find a nice solution to put libatomic_ops as a subdir into bdwgc")
-        }
-    }
+    let libatomic_include_path = Path::new(LIB_ATOMIC_OPS_DIR)
+        .join("src")
+        .canonicalize()
+        .unwrap()
+        .display()
+        .to_string()
+        .replace(r"\\?\", "");
 
     let dst = Config::new(LIB_GC_DIR)
         .profile("Release")
         .define("BUILD_SHARED_LIBS", "FALSE")
+        .cflag(format!("-I{}", libatomic_include_path))
         .build();
 
     println!(
